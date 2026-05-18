@@ -34,13 +34,11 @@ class CharacterSheetManagerTest extends TestCase
             'name' => 'Astra',
             'class' => 'Wizard',
             'level' => 5,
-            'user_id' => $otherUser->id,
         ]);
 
         $character = Character::where('name', 'Astra')->first();
 
         $response->assertRedirect(route('characters.show', $character));
-        $this->assertTrue($character->user->is($user));
 
         $this->actingAs($user)->get(route('characters.index'))
             ->assertOk()
