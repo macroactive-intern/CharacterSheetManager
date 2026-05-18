@@ -109,14 +109,14 @@ class CharacterSheetManagerTest extends TestCase
             'value' => 10,
         ]);
 
-        $this->actingAs($user)->put(route('characters.stats.update', [$character, $otherStat]), [
+        $this->actingAs($user)->put(route('stats.update', $otherStat), [
             'stats' => [
                 $otherStat->id => [
                     'name' => 'Luck',
                     'value' => 10,
                 ],
             ],
-        ])->assertNotFound();
+        ])->assertForbidden();
     }
 
     public function test_stat_names_must_be_unique_per_character(): void
@@ -165,7 +165,7 @@ class CharacterSheetManagerTest extends TestCase
         $this->assertTrue($item->character->is($character));
         $this->assertTrue($item->equipped);
 
-        $this->actingAs($user)->patch(route('characters.items.toggle-equipped', [$character, $item]))
+        $this->actingAs($user)->patch(route('items.toggle-equipped', $item))
             ->assertRedirect(route('characters.show', $character));
 
         $this->assertFalse($item->fresh()->equipped);
@@ -175,8 +175,8 @@ class CharacterSheetManagerTest extends TestCase
             'type' => 'Weapon',
         ]);
 
-        $this->actingAs($user)->delete(route('characters.items.destroy', [$character, $otherItem]))
-            ->assertNotFound();
+        $this->actingAs($user)->delete(route('items.destroy', $otherItem))
+            ->assertForbidden();
     }
 
     public function test_deleting_character_cascades_to_stats_and_items(): void

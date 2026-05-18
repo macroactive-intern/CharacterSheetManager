@@ -31,10 +31,10 @@ class ItemController extends Controller
             ->with('status', 'Item added.');
     }
 
-    public function update(Request $request, Character $character, Item $item): RedirectResponse
+    public function update(Request $request, Item $item): RedirectResponse
     {
+        $character = $item->character;
         $this->authorize('update', $character);
-        $this->ensureItemBelongsToCharacter($character, $item);
 
         $itemKey = "items.{$item->id}";
 
@@ -56,10 +56,10 @@ class ItemController extends Controller
             ->with('status', 'Item updated.');
     }
 
-    public function destroy(Character $character, Item $item): RedirectResponse
+    public function destroy(Item $item): RedirectResponse
     {
+        $character = $item->character;
         $this->authorize('update', $character);
-        $this->ensureItemBelongsToCharacter($character, $item);
 
         $item->delete();
 
@@ -67,10 +67,10 @@ class ItemController extends Controller
             ->with('status', 'Item deleted.');
     }
 
-    public function toggleEquipped(Character $character, Item $item): RedirectResponse
+    public function toggleEquipped(Item $item): RedirectResponse
     {
+        $character = $item->character;
         $this->authorize('update', $character);
-        $this->ensureItemBelongsToCharacter($character, $item);
 
         $item->update([
             'equipped' => ! $item->equipped,
@@ -78,12 +78,5 @@ class ItemController extends Controller
 
         return redirect()->route('characters.show', $character)
             ->with('status', 'Item updated.');
-    }
-
-    private function ensureItemBelongsToCharacter(Character $character, Item $item): void
-    {
-        if ($item->character_id !== $character->id) {
-            abort(404);
-        }
     }
 }

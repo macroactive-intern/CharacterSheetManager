@@ -21,26 +21,11 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('characters', CharacterController::class);
 
-    Route::post('/characters/{character}/stats', [StatController::class, 'store'])
-        ->name('characters.stats.store');
+    Route::resource('characters.stats', StatController::class)->shallow()->only(['store', 'update', 'destroy']);
+    Route::resource('characters.items', ItemController::class)->shallow()->only(['store', 'update', 'destroy']);
 
-    Route::put('/characters/{character}/stats/{stat}', [StatController::class, 'update'])
-        ->name('characters.stats.update');
-
-    Route::delete('/characters/{character}/stats/{stat}', [StatController::class, 'destroy'])
-        ->name('characters.stats.destroy');
-
-    Route::post('/characters/{character}/items', [ItemController::class, 'store'])
-        ->name('characters.items.store');
-
-    Route::put('/characters/{character}/items/{item}', [ItemController::class, 'update'])
-        ->name('characters.items.update');
-
-    Route::delete('/characters/{character}/items/{item}', [ItemController::class, 'destroy'])
-        ->name('characters.items.destroy');
-
-    Route::patch('/characters/{character}/items/{item}/toggle-equipped', [ItemController::class, 'toggleEquipped'])
-        ->name('characters.items.toggle-equipped');
+    Route::patch('/items/{item}/toggle-equipped', [ItemController::class, 'toggleEquipped'])
+        ->name('items.toggle-equipped');
 });
 
 require __DIR__.'/auth.php';

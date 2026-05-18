@@ -42,10 +42,10 @@ class StatController extends Controller
             ->with('status', 'Stat added.');
     }
 
-    public function update(Request $request, Character $character, Stat $stat): RedirectResponse
+    public function update(Request $request, Stat $stat): RedirectResponse
     {
+        $character = $stat->character;
         $this->authorize('update', $character);
-        $this->ensureStatBelongsToCharacter($character, $stat);
 
         $statKey = "stats.{$stat->id}";
 
@@ -65,7 +65,6 @@ class StatController extends Controller
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                $this->ensureStatBelongsToCharacter($lockedCharacter, $lockedStat);
                 $this->ensureStatNameIsUnique($lockedCharacter, $statData['name'], $lockedStat, "{$statKey}.name");
                 $this->ensureStatTotalIsValid($lockedCharacter, (int) $statData['value'], $lockedStat, "{$statKey}.value");
 
@@ -79,22 +78,15 @@ class StatController extends Controller
             ->with('status', 'Stat updated.');
     }
 
-    public function destroy(Character $character, Stat $stat): RedirectResponse
+    public function destroy(Stat $stat): RedirectResponse
     {
+        $character = $stat->character;
         $this->authorize('update', $character);
-        $this->ensureStatBelongsToCharacter($character, $stat);
 
         $stat->delete();
 
         return redirect()->route('characters.show', $character)
             ->with('status', 'Stat deleted.');
-    }
-
-    private function ensureStatBelongsToCharacter(Character $character, Stat $stat): void
-    {
-        if ($stat->character_id !== $character->id) {
-            abort(404);
-        }
     }
 
     private function ensureStatTotalIsValid(Character $character, int $value, ?Stat $stat = null, string $errorKey = 'value'): void
